@@ -3,7 +3,7 @@
 // Copyright (c) 2010 Doug McInnes
 //
 
-KEY_CODES = {
+const KEY_CODES = {
   32: 'space',
   37: 'left',
   38: 'up',
@@ -16,8 +16,8 @@ KEY_CODES = {
   80: 'p'
 }
 
-KEY_STATUS = { keyDown:false };
-for (code in KEY_CODES) {
+const KEY_STATUS = { keyDown:false };
+for (const code in KEY_CODES) {
   KEY_STATUS[KEY_CODES[code]] = false;
 }
 
@@ -35,9 +35,9 @@ $(window).keydown(function (e) {
   }
 });
 
-GRID_SIZE = 60;
+const GRID_SIZE = 60;
 
-Matrix = function (rows, columns) {
+const Matrix = function (rows, columns) {
   var i, j;
   this.data = new Array(rows);
   for (i = 0; i < rows; i++) {
@@ -74,7 +74,7 @@ Matrix = function (rows, columns) {
   };
 };
 
-Sprite = function () {
+const Sprite = function () {
   this.init = function (name, points) {
     this.name     = name;
     this.points   = points;
@@ -229,7 +229,7 @@ Sprite = function () {
 
     this.context.lineWidth = 1.0 / this.scale;
 
-    for (child in this.children) {
+    for (const child in this.children) {
       this.children[child].draw();
     }
 
@@ -365,7 +365,7 @@ Sprite = function () {
 
 };
 
-Ship = function () {
+const Ship = function () {
   this.init("ship",
             [-5,   4,
               0, -12,
@@ -448,7 +448,7 @@ Ship = function () {
 };
 Ship.prototype = new Sprite();
 
-BigAlien = function () {
+const BigAlien = function () {
   this.init("bigalien",
             [-20,   0,
              -12,  -4,
@@ -572,7 +572,7 @@ BigAlien = function () {
 };
 BigAlien.prototype = new Sprite();
 
-Bullet = function () {
+const Bullet = function () {
   this.init("bullet", [0, 0]);
   this.time = 0;
   this.bridgesH = false;
@@ -618,7 +618,7 @@ Bullet = function () {
 };
 Bullet.prototype = new Sprite();
 
-AlienBullet = function () {
+const AlienBullet = function () {
   this.init("alienbullet");
 
   this.draw = function () {
@@ -635,7 +635,7 @@ AlienBullet = function () {
 };
 AlienBullet.prototype = new Bullet();
 
-Asteroid = function () {
+const Asteroid = function () {
   this.init("asteroid",
             [-10,   0,
               -5,   7,
@@ -678,7 +678,7 @@ Asteroid = function () {
 };
 Asteroid.prototype = new Sprite();
 
-Explosion = function () {
+const Explosion = function () {
   this.init("explosion");
 
   this.bridgesH = false;
@@ -718,7 +718,7 @@ Explosion = function () {
 };
 Explosion.prototype = new Sprite();
 
-GridNode = function () {
+const GridNode = function () {
   this.north = null;
   this.south = null;
   this.east  = null;
@@ -769,7 +769,7 @@ GridNode = function () {
 
 // borrowed from typeface-0.14.js
 // http://typeface.neocracy.org
-Text = {
+const Text = {
   renderGlyph: function (ctx, face, char) {
 
     var glyph = face.glyphs[char];
@@ -838,7 +838,7 @@ Text = {
   face: null
 };
 
-SFX = {
+const SFX = {
   laser:     new Audio('sound/584193__unfa__weapons-plasma-shot-01.flac'),
   explosion: new Audio('sound/584169__unfa__explosion-01.flac')
 };
@@ -864,7 +864,7 @@ for (var sfx in SFX) {
 // pre-mute audio
 SFX.muted = true;
 
-Game = {
+const Game = {
   score: 0,
   totalAsteroids: 5,
   lives: 0,
