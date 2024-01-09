@@ -81,6 +81,10 @@ class Sprite {
     this.preMove = null;
     this.postMove = null;
 
+    this.grid = window.grid;
+    this.context = window.context;
+    this.matrix = new Matrix(2, 3);
+
     this.run = function (delta) {
 
       this.move(delta);
@@ -239,6 +243,18 @@ class Sprite {
       }
     };
     this.checkCollision = function (other) {
+
+      function isPointInPolygon(obj, x, y) {
+        if (obj.context) {
+          // Use isPointInPath for browsers supporting it
+          return obj.context.isPointInPath(x, y);
+        } else {
+          // Implement a fallback method if context is not available
+          // Add your custom logic for point in polygon check here
+          // Example: return customPointInPolygonCheck(obj, x, y);
+          return false;
+        }
+      }
       if (!other.visible ||
         this === other ||
         this.collidesWith.indexOf(other.name) === -1) {
@@ -261,18 +277,6 @@ class Sprite {
         }
       }
     };
-
-    function isPointInPolygon(obj, x, y) {
-      if (obj.context) {
-        // Use isPointInPath for browsers supporting it
-        return obj.context.isPointInPath(x, y);
-      } else {
-        // Implement a fallback method if context is not available
-        // Add your custom logic for point in polygon check here
-        // Example: return customPointInPolygonCheck(obj, x, y);
-        return false;
-      }
-    }
     this.pointInPolygon = function (x, y) {
       var points = this.transformedPoints();
       var j = 2;
@@ -538,7 +542,7 @@ class BigAlien extends Sprite {
 
     };
 
-    BigAlien.prototype.collision = function (other) {
+    this.collision = function (other) {
       if (other.name == "bullet") Game.score += 200;
       SFX.explosion();
       Game.explosionAt(other.x, other.y);
@@ -674,7 +678,7 @@ class Asteroid extends Sprite {
   }
 }
 
-class Explosion extends Sprite{
+class Explosion extends Sprite {
   constructor() {
     super();
     this.init("explosion");
@@ -1065,14 +1069,14 @@ document.addEventListener('DOMContentLoaded', () => {
   Game.canvasWidth = canvas.width;
   Game.canvasHeight = canvas.height;
 
-  var context = canvas.getContext("2d");
+  window.context = canvas.getContext("2d");
 
   Text.context = context;
   Text.face = vector_battle;
 
   var gridWidth = Math.round(Game.canvasWidth / GRID_SIZE);
   var gridHeight = Math.round(Game.canvasHeight / GRID_SIZE);
-  var grid = new Array(gridWidth);
+  window.grid = new Array(gridWidth);
   for (var i = 0; i < gridWidth; i++) {
     grid[i] = new Array(gridHeight);
     for (var j = 0; j < gridHeight; j++) {
@@ -1104,11 +1108,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var sprites = [];
   Game.sprites = sprites;
-
-  // so all the sprites can use it
-  Sprite.prototype.context = context;
-  Sprite.prototype.grid = grid;
-  Sprite.prototype.matrix = new Matrix(2, 3);
 
   var ship = new Ship();
 
