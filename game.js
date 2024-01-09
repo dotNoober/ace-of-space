@@ -3,6 +3,8 @@
 // Copyright (c) 2010 Doug McInnes
 //
 
+import { KEY_STATUS, KEY_CODES } from "./user-input.js";
+
 class Matrix {
   constructor(rows, columns) {
     var i, j;
@@ -937,50 +939,7 @@ const Game = {
 
 };
 
-const initializeKeyStatus = () => {
-  // Initialize key status object with a default keyDown value
-  const keyStatus = { keyDown: false };
-  // Iterate through each key code and initialize its status in the keyStatus object
-  for (const code in KEY_CODES) {
-    keyStatus[KEY_CODES[code]] = false;
-  }
-  return keyStatus;
-}
-
 const GRID_SIZE = 60;
-
-const KEY_CODES = {
-  'Space': 'space',       //shoot
-  'ArrowLeft': 'left',    //rotate left
-  'ArrowUp': 'up',        //gas
-  'ArrowRight': 'right',  //rotate right
-  'ArrowDown': 'down',    //
-  'KeyF': 'f',            //toggle fps display
-  'KeyG': 'g',            //hold to display grid
-  'KeyH': 'h',            //
-  'KeyM': 'm',            //toggle mute
-  'KeyP': 'p'             //toggle pause
-};
-
-const KEY_STATUS = initializeKeyStatus();
-
-window.addEventListener('keydown', (e) => {
-  KEY_STATUS.keyDown = true;
-  const keyName = KEY_CODES[e.code];
-  if (keyName) {
-    e.preventDefault();
-    KEY_STATUS[keyName] = true;
-  }
-});
-
-window.addEventListener('keyup', (e) => {
-  KEY_STATUS.keyDown = false;
-  const keyName = KEY_CODES[e.code];
-  if (keyName) {
-    e.preventDefault();
-    KEY_STATUS[keyName] = false;
-  }
-});
 
 // preload audio
 for (var sfx in SFX) {
@@ -1009,6 +968,8 @@ document.addEventListener('DOMContentLoaded', () => {
   Game.canvasHeight = canvas.height;
 
   window.context = canvas.getContext("2d");
+  window.context.strokeStyle = "white";
+  window.context.fillStyle = "white";
 
   var gridWidth = Math.round(Game.canvasWidth / GRID_SIZE);
   var gridHeight = Math.round(Game.canvasHeight / GRID_SIZE);

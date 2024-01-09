@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script src="jquery-1.4.1.min.js"></script>
-  <script src="vector_battle_regular.typeface.js"></script>
-  <script src="ipad.js"></script>
   <script src="game.js" type="module"></script>
   <style>
     @font-face {
@@ -17,11 +15,31 @@
         url('fonts/Obti Sans/Obti Sans.ttf') format('truetype'),
         url('fonts/Obti Sans/Obti Sans.svg#CustomFont') format('svg');
     }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background: black;
+      padding: 0;
+      margin: 0;
+    }
+
+    #game-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
     #canvas {
-      border: 1px solid black;
-      top: 0px;
-      left: 0px;
+      border: 1px solid red;
+      flex: 1;
+      transform-origin: top left;
+      transform: scale(calc(100vw / 780), calc(100vh / 540));
+      image-rendering: pixelated;
     }
 
     .button {
