@@ -771,76 +771,15 @@ class GridNode {
   }
 }
 
-// borrowed from typeface-0.14.js
-// http://typeface.neocracy.org
-const Text = {
-  renderGlyph: function (ctx, face, char) {
+function renderText(text, size, x, y) {
+    window.context.save();
 
-    var glyph = face.glyphs[char];
+    window.context.font = `${size}px Obti Sans`; // Set the font size and type
+    window.context.fillText(text, x, y); // Draw filled text
 
-    if (glyph.o) {
 
-      var outline;
-      if (glyph.cached_outline) {
-        outline = glyph.cached_outline;
-      } else {
-        outline = glyph.o.split(' ');
-        glyph.cached_outline = outline;
-      }
-
-      var outlineLength = outline.length;
-      for (var i = 0; i < outlineLength;) {
-
-        var action = outline[i++];
-
-        switch (action) {
-          case 'm':
-            ctx.moveTo(outline[i++], outline[i++]);
-            break;
-          case 'l':
-            ctx.lineTo(outline[i++], outline[i++]);
-            break;
-
-          case 'q':
-            var cpx = outline[i++];
-            var cpy = outline[i++];
-            ctx.quadraticCurveTo(outline[i++], outline[i++], cpx, cpy);
-            break;
-
-          case 'b':
-            var x = outline[i++];
-            var y = outline[i++];
-            ctx.bezierCurveTo(outline[i++], outline[i++], outline[i++], outline[i++], x, y);
-            break;
-        }
-      }
-    }
-    if (glyph.ha) {
-      ctx.translate(glyph.ha, 0);
-    }
-  },
-
-  renderText: function (text, size, x, y) {
-    this.context.save();
-
-    this.context.translate(x, y);
-
-    var pixels = size * 72 / (this.face.resolution * 100);
-    this.context.scale(pixels, -1 * pixels);
-    this.context.beginPath();
-    var chars = text.split('');
-    var charsLength = chars.length;
-    for (var i = 0; i < charsLength; i++) {
-      this.renderGlyph(this.context, this.face, chars[i]);
-    }
-    this.context.fill();
-
-    this.context.restore();
-  },
-
-  context: null,
-  face: null
-};
+    window.context.restore();
+  }
 
 const SFX = {
   laser: new Audio('sound/584193__unfa__weapons-plasma-shot-01.flac'),
@@ -897,7 +836,7 @@ const Game = {
       this.state = 'waiting';
     },
     waiting: function () {
-      Text.renderText(window.ipad ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth / 2 - 270, Game.canvasHeight / 2);
+      renderText(window.ipad ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth / 2 - 270, Game.canvasHeight / 2);
       if (KEY_STATUS.space || window.gameStart) {
         KEY_STATUS.space = false; // hack so we don't shoot right away
         window.gameStart = false;
@@ -977,7 +916,7 @@ const Game = {
       }
     },
     end_game: function () {
-      Text.renderText('GAME OVER', 50, Game.canvasWidth / 2 - 160, Game.canvasHeight / 2 + 10);
+      renderText('GAME OVER', 50, Game.canvasWidth / 2 - 160, Game.canvasHeight / 2 + 10);
       if (this.timer == null) {
         this.timer = Date.now();
       }
@@ -1070,9 +1009,6 @@ document.addEventListener('DOMContentLoaded', () => {
   Game.canvasHeight = canvas.height;
 
   window.context = canvas.getContext("2d");
-
-  Text.context = context;
-  Text.face = vector_battle;
 
   var gridWidth = Math.round(Game.canvasWidth / GRID_SIZE);
   var gridHeight = Math.round(Game.canvasHeight / GRID_SIZE);
@@ -1201,7 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // score
     var score_text = '' + Game.score;
-    Text.renderText(score_text, 18, Game.canvasWidth - 14 * score_text.length, 20);
+    renderText(score_text, 20, Game.canvasWidth - 14 * score_text.length, 20);
 
     // extra dudes
     for (i = 0; i < Game.lives; i++) {
@@ -1214,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (showFramerate) {
-      Text.renderText('' + avgFramerate, 24, Game.canvasWidth - 38, Game.canvasHeight - 2);
+      renderText('' + avgFramerate, 24, Game.canvasWidth - 38, Game.canvasHeight - 2);
     }
 
     frameCount++;
@@ -1226,7 +1162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (paused) {
-      Text.renderText('PAUSED', 72, Game.canvasWidth / 2 - 160, 120);
+      renderText('PAUSED', 72, Game.canvasWidth / 2 - 160, 120);
     } else {
       requestAnimFrame(mainLoop, canvasNode);
     }

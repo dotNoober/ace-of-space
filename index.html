@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,16 +10,67 @@
   <script src="ipad.js"></script>
   <script src="game.js" type="module"></script>
   <style>
-    #canvas { border:1px solid black; top:0px; left:0px; }
-    .button { position:absolute; border:1px solid black; }
-    #left-controls { position:absolute; left:1px; bottom:0px; display:none; }
-    #right-controls { position:absolute; right:1px; bottom:0px; display:none; }
-    #up { width:200px; height:100px; bottom:100px;}
-    #left { width:100px; height:100px; bottom:0px;}
-    #right { width:100px; height:100px; bottom:0px; left:100px; }
-    #space { width:200px; height:200px; bottom:0px; right:0px; }
+    @font-face {
+      font-family: 'Obti Sans';
+      src: url('fonts/Obti Sans/Obti Sans.eot');
+      src: url('fonts/Obti Sans/Obti Sans.eot?#iefix') format('embedded-opentype'),
+        url('fonts/Obti Sans/Obti Sans.ttf') format('truetype'),
+        url('fonts/Obti Sans/Obti Sans.svg#CustomFont') format('svg');
+    }
+
+    #canvas {
+      border: 1px solid black;
+      top: 0px;
+      left: 0px;
+    }
+
+    .button {
+      position: absolute;
+      border: 1px solid black;
+    }
+
+    #left-controls {
+      position: absolute;
+      left: 1px;
+      bottom: 0px;
+      display: none;
+    }
+
+    #right-controls {
+      position: absolute;
+      right: 1px;
+      bottom: 0px;
+      display: none;
+    }
+
+    #up {
+      width: 200px;
+      height: 100px;
+      bottom: 100px;
+    }
+
+    #left {
+      width: 100px;
+      height: 100px;
+      bottom: 0px;
+    }
+
+    #right {
+      width: 100px;
+      height: 100px;
+      bottom: 0px;
+      left: 100px;
+    }
+
+    #space {
+      width: 200px;
+      height: 200px;
+      bottom: 0px;
+      right: 0px;
+    }
   </style>
 </head>
+
 <body>
   <div id="game-container">
     <canvas id="canvas" width="780" height="540"></canvas>
@@ -30,6 +82,7 @@
     <div id="right-controls">
       <button id="space" class='button'>FIRE</button>
     </div>
-  </div> 
+  </div>
 </body>
+
 </html>
