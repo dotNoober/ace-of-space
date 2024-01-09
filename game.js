@@ -389,6 +389,7 @@ class Ship extends Sprite {
       }
 
       if (KEY_STATUS.up) {
+          SFX.engineStart();
         var rad = ((this.rot - 90) * Math.PI) / 180;
         this.acc.x = 0.5 * Math.cos(rad);
         this.acc.y = 0.5 * Math.sin(rad);
@@ -407,7 +408,7 @@ class Ship extends Sprite {
           this.bulletCounter = 10;
           for (var i = 0; i < this.bullets.length; i++) {
             if (!this.bullets[i].visible) {
-              SFX.sfx.laser();
+              SFX.laser();
               var bullet = this.bullets[i];
               var rad = ((this.rot - 90) * Math.PI) / 180;
               var vectorx = Math.cos(rad);
@@ -432,7 +433,7 @@ class Ship extends Sprite {
     };
 
     this.collision = function (other) {
-      SFX.sfx.explosion();
+      SFX.explosion();
       Game.explosionAt(other.x, other.y);
       Game.FSM.state = 'player_died';
       this.visible = false;
@@ -537,7 +538,7 @@ class BigAlien extends Sprite {
             bullet.vel.x = 6 * vectorx;
             bullet.vel.y = 6 * vectory;
             bullet.visible = true;
-            SFX.sfx.laser();
+            SFX.laser();
             break;
           }
         }
@@ -547,7 +548,7 @@ class BigAlien extends Sprite {
 
     this.collision = function (other) {
       if (other.name == "bullet") Game.score += 200;
-      SFX.sfx.explosion();
+      SFX.explosion();
       Game.explosionAt(other.x, other.y);
       this.visible = false;
       this.newPosition();
@@ -658,7 +659,7 @@ class Asteroid extends Sprite {
     this.collidesWith = ["ship", "bullet", "bigalien", "alienbullet"];
 
     this.collision = function (other) {
-      SFX.sfx.explosion();
+      SFX.explosion();
       if (other.name == "bullet") Game.score += 120 / this.scale;
       this.scale /= 3;
       if (this.scale > 0.5) {
@@ -1119,7 +1120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         break;
       case 'm': // mute
-        SFX.sfx.muted = !SFX.sfx.muted;
+        SFX.muted = !SFX.muted;
         break;
     }
   });
