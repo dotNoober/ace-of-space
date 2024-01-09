@@ -3,6 +3,7 @@
 // Copyright (c) 2010 Doug McInnes
 //
 
+import { SFX } from "./sounds-effects.js";
 import { KEY_STATUS, KEY_CODES } from "./user-input.js";
 
 class Matrix {
@@ -406,7 +407,7 @@ class Ship extends Sprite {
           this.bulletCounter = 10;
           for (var i = 0; i < this.bullets.length; i++) {
             if (!this.bullets[i].visible) {
-              SFX.laser();
+              SFX.sfx.laser();
               var bullet = this.bullets[i];
               var rad = ((this.rot - 90) * Math.PI) / 180;
               var vectorx = Math.cos(rad);
@@ -431,7 +432,7 @@ class Ship extends Sprite {
     };
 
     this.collision = function (other) {
-      SFX.explosion();
+      SFX.sfx.explosion();
       Game.explosionAt(other.x, other.y);
       Game.FSM.state = 'player_died';
       this.visible = false;
@@ -536,7 +537,7 @@ class BigAlien extends Sprite {
             bullet.vel.x = 6 * vectorx;
             bullet.vel.y = 6 * vectory;
             bullet.visible = true;
-            SFX.laser();
+            SFX.sfx.laser();
             break;
           }
         }
@@ -546,7 +547,7 @@ class BigAlien extends Sprite {
 
     this.collision = function (other) {
       if (other.name == "bullet") Game.score += 200;
-      SFX.explosion();
+      SFX.sfx.explosion();
       Game.explosionAt(other.x, other.y);
       this.visible = false;
       this.newPosition();
@@ -657,7 +658,7 @@ class Asteroid extends Sprite {
     this.collidesWith = ["ship", "bullet", "bigalien", "alienbullet"];
 
     this.collision = function (other) {
-      SFX.explosion();
+      SFX.sfx.explosion();
       if (other.name == "bullet") Game.score += 120 / this.scale;
       this.scale /= 3;
       if (this.scale > 0.5) {
@@ -782,12 +783,6 @@ function renderText(text, size, x, y) {
 
     window.context.restore();
   }
-
-const SFX = {
-  laser: new Audio('sound/584193__unfa__weapons-plasma-shot-01.flac'),
-  explosion: new Audio('sound/584169__unfa__explosion-01.flac')
-};
-
 
 const Game = {
   score: 0,
@@ -940,27 +935,6 @@ const Game = {
 };
 
 const GRID_SIZE = 60;
-
-// preload audio
-for (var sfx in SFX) {
-  (function () {
-    var audio = SFX[sfx];
-    audio.muted = true;
-    audio.play();
-
-    SFX[sfx] = function () {
-      if (!SFX.muted) {
-        audio.muted = false;
-        audio.pause();
-        audio.currentTime = 0;
-        audio.play();
-      }
-      return audio;
-    }
-  })();
-}
-// pre-mute audio
-SFX.muted = true;
 
 document.addEventListener('DOMContentLoaded', () => {
   var canvas = document.getElementById("canvas");
@@ -1145,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         break;
       case 'm': // mute
-        SFX.muted = !SFX.muted;
+        SFX.sfx.muted = !SFX.sfx.muted;
         break;
     }
   });

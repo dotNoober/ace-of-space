@@ -48,11 +48,8 @@ const rightControls = document.getElementById('right-controls');
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
 if (isTouchDevice) {
-  document.addEventListener('DOMContentLoaded', function () {
-    // Assuming leftControls and rightControls are defined somewhere in your code
     leftControls.style.display = 'block';
     rightControls.style.display = 'block';
-  });
 }
 
 [leftControls, rightControls].forEach(function (control) {
