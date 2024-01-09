@@ -186,7 +186,7 @@ class Sprite {
         this.context.lineWidth = 3.0;
         this.context.strokeStyle = 'green';
         this.context.strokeRect(gridx * GRID_SIZE + 2, gridy * GRID_SIZE + 2, GRID_SIZE - 4, GRID_SIZE - 4);
-        this.context.strokeStyle = 'black';
+        this.context.strokeStyle = 'grey';
         this.context.lineWidth = 1.0;
       }
     };
