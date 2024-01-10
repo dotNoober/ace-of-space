@@ -389,7 +389,7 @@ class Ship extends Sprite {
       }
 
       if (KEY_STATUS.up) {
-        if(!this.engineSound) {
+        if (!this.engineSound) {
           this.engineSound = SFX.engine();
           this.engineSound.loop = true;
         }
@@ -398,9 +398,9 @@ class Ship extends Sprite {
         this.acc.y = 0.5 * Math.sin(rad);
         this.children.exhaust.visible = Math.random() > 0.1;
       } else {
-        if(this.engineSound) {
-        this.engineSound.pause();
-        this.engineSound = undefined;
+        if (this.engineSound) {
+          this.engineSound.pause();
+          this.engineSound = undefined;
         }
         this.acc.x = 0;
         this.acc.y = 0;
@@ -791,7 +791,7 @@ class StateMachine {
     this.state = 'waiting';
   }
   waiting() {
-    renderText(window.isTouchDevice  ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth / 2 - 270, Game.canvasHeight / 2);
+    renderText(window.isTouchDevice ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth / 2 - 270, Game.canvasHeight / 2);
     if (KEY_STATUS.space || window.gameStart) {
       KEY_STATUS.space = false; // hack so we don't shoot right away
       window.gameStart = false;
@@ -890,15 +890,44 @@ class StateMachine {
   }
 }
 
+function saveHighScore(score) {
+  // Get current date/time
+  const currentDate = new Date();
+  
+  // Create a high score object
+  const highScore = {
+      datetime: currentDate.toLocaleString(), // Convert date to a readable string
+      score: score
+  };
+
+  // Get existing high scores from localStorage or initialize an empty array
+  let highScores = getHighScores();
+
+  // Add the new high score to the array
+  highScores.push(highScore);
+
+  // Sort high scores in descending order based on the score
+  highScores.sort((a, b) => b.score - a.score);
+
+  // Save the updated high scores array back to localStorage
+  localStorage.setItem('highScores', JSON.stringify(highScores));
+}
+
+function getHighScores() {
+  // Get high scores from localStorage or return an empty array if not present
+  return JSON.parse(localStorage.getItem('highScores')) || [];
+}
+
+
 function renderText(text, size, x, y) {
-    window.context.save();
+  window.context.save();
 
-    window.context.font = `${size}px Obti Sans`; // Set the font size and type
-    window.context.fillText(text, x, y); // Draw filled text
+  window.context.font = `${size}px Obti Sans`; // Set the font size and type
+  window.context.fillText(text, x, y); // Draw filled text
 
 
-    window.context.restore();
-  }
+  window.context.restore();
+}
 
 const Game = {
   score: 0,
@@ -951,178 +980,178 @@ const GRID_SIZE = 60;
 
 //main code 
 
-  var canvas = document.getElementById("canvas");
-  Game.canvasWidth = canvas.width;
-  Game.canvasHeight = canvas.height;
+var canvas = document.getElementById("canvas");
+Game.canvasWidth = canvas.width;
+Game.canvasHeight = canvas.height;
 
-  window.context = canvas.getContext("2d");
-  window.context.strokeStyle = "white";
-  window.context.fillStyle = "white";
+window.context = canvas.getContext("2d");
+window.context.strokeStyle = "white";
+window.context.fillStyle = "white";
 
-  var gridWidth = Math.round(Game.canvasWidth / GRID_SIZE);
-  var gridHeight = Math.round(Game.canvasHeight / GRID_SIZE);
-  window.grid = new Array(gridWidth);
-  for (var i = 0; i < gridWidth; i++) {
-    grid[i] = new Array(gridHeight);
-    for (var j = 0; j < gridHeight; j++) {
-      grid[i][j] = new GridNode();
-    }
-  }
-
-  // set up the positional references
-  for (var i = 0; i < gridWidth; i++) {
-    for (var j = 0; j < gridHeight; j++) {
-      var node = grid[i][j];
-      node.north = grid[i][(j == 0) ? gridHeight - 1 : j - 1];
-      node.south = grid[i][(j == gridHeight - 1) ? 0 : j + 1];
-      node.west = grid[(i == 0) ? gridWidth - 1 : i - 1][j];
-      node.east = grid[(i == gridWidth - 1) ? 0 : i + 1][j];
-    }
-  }
-
-  // set up borders
-  for (var i = 0; i < gridWidth; i++) {
-    grid[i][0].dupe.vertical = Game.canvasHeight;
-    grid[i][gridHeight - 1].dupe.vertical = -Game.canvasHeight;
-  }
-
+var gridWidth = Math.round(Game.canvasWidth / GRID_SIZE);
+var gridHeight = Math.round(Game.canvasHeight / GRID_SIZE);
+window.grid = new Array(gridWidth);
+for (var i = 0; i < gridWidth; i++) {
+  grid[i] = new Array(gridHeight);
   for (var j = 0; j < gridHeight; j++) {
-    grid[0][j].dupe.horizontal = Game.canvasWidth;
-    grid[gridWidth - 1][j].dupe.horizontal = -Game.canvasWidth;
+    grid[i][j] = new GridNode();
+  }
+}
+
+// set up the positional references
+for (var i = 0; i < gridWidth; i++) {
+  for (var j = 0; j < gridHeight; j++) {
+    var node = grid[i][j];
+    node.north = grid[i][(j == 0) ? gridHeight - 1 : j - 1];
+    node.south = grid[i][(j == gridHeight - 1) ? 0 : j + 1];
+    node.west = grid[(i == 0) ? gridWidth - 1 : i - 1][j];
+    node.east = grid[(i == gridWidth - 1) ? 0 : i + 1][j];
+  }
+}
+
+// set up borders
+for (var i = 0; i < gridWidth; i++) {
+  grid[i][0].dupe.vertical = Game.canvasHeight;
+  grid[i][gridHeight - 1].dupe.vertical = -Game.canvasHeight;
+}
+
+for (var j = 0; j < gridHeight; j++) {
+  grid[0][j].dupe.horizontal = Game.canvasWidth;
+  grid[gridWidth - 1][j].dupe.horizontal = -Game.canvasWidth;
+}
+
+var sprites = [];
+Game.sprites = sprites;
+
+var ship = new Ship();
+
+ship.x = Game.canvasWidth / 2;
+ship.y = Game.canvasHeight / 2;
+
+sprites.push(ship);
+
+ship.bullets = [];
+for (var i = 0; i < 10; i++) {
+  var bull = new Bullet();
+  ship.bullets.push(bull);
+  sprites.push(bull);
+}
+Game.ship = ship;
+
+var bigAlien = new BigAlien();
+bigAlien.setup();
+sprites.push(bigAlien);
+Game.bigAlien = bigAlien;
+
+var extraDude = new Ship();
+extraDude.scale = 0.6;
+extraDude.visible = true;
+extraDude.preMove = null;
+extraDude.children = [];
+
+var i, j = 0;
+
+var paused = false;
+var showFramerate = false;
+var avgFramerate = 0;
+var frameCount = 0;
+var elapsedCounter = 0;
+
+var lastFrame = Date.now();
+var thisFrame;
+var elapsed;
+var delta;
+
+var canvasNode = canvas[0];
+
+
+var mainLoop = function () {
+  context.clearRect(0, 0, Game.canvasWidth, Game.canvasHeight);
+
+  Game.FSM.execute();
+
+  if (KEY_STATUS.g) {
+    context.beginPath();
+    for (var i = 0; i < gridWidth; i++) {
+      context.moveTo(i * GRID_SIZE, 0);
+      context.lineTo(i * GRID_SIZE, Game.canvasHeight);
+    }
+    for (var j = 0; j < gridHeight; j++) {
+      context.moveTo(0, j * GRID_SIZE);
+      context.lineTo(Game.canvasWidth, j * GRID_SIZE);
+    }
+    context.closePath();
+    context.stroke();
   }
 
-  var sprites = [];
-  Game.sprites = sprites;
+  thisFrame = Date.now();
+  elapsed = thisFrame - lastFrame;
+  lastFrame = thisFrame;
+  delta = elapsed / 30;
 
-  var ship = new Ship();
+  for (i = 0; i < sprites.length; i++) {
 
-  ship.x = Game.canvasWidth / 2;
-  ship.y = Game.canvasHeight / 2;
+    sprites[i].run(delta);
 
-  sprites.push(ship);
-
-  ship.bullets = [];
-  for (var i = 0; i < 10; i++) {
-    var bull = new Bullet();
-    ship.bullets.push(bull);
-    sprites.push(bull);
+    if (sprites[i].reap) {
+      sprites[i].reap = false;
+      sprites.splice(i, 1);
+      i--;
+    }
   }
-  Game.ship = ship;
 
-  var bigAlien = new BigAlien();
-  bigAlien.setup();
-  sprites.push(bigAlien);
-  Game.bigAlien = bigAlien;
+  // score
+  var score_text = '' + Game.score;
+  renderText(score_text, 20, Game.canvasWidth - 14 * score_text.length, 20);
 
-  var extraDude = new Ship();
-  extraDude.scale = 0.6;
-  extraDude.visible = true;
-  extraDude.preMove = null;
-  extraDude.children = [];
+  // extra dudes
+  for (i = 0; i < Game.lives; i++) {
+    context.save();
+    extraDude.x = Game.canvasWidth - (8 * (i + 1));
+    extraDude.y = 32;
+    extraDude.configureTransform();
+    extraDude.draw();
+    context.restore();
+  }
 
-  var i, j = 0;
+  if (showFramerate) {
+    renderText('' + avgFramerate, 24, Game.canvasWidth - 38, Game.canvasHeight - 2);
+  }
 
-  var paused = false;
-  var showFramerate = false;
-  var avgFramerate = 0;
-  var frameCount = 0;
-  var elapsedCounter = 0;
+  frameCount++;
+  elapsedCounter += elapsed;
+  if (elapsedCounter > 1000) {
+    elapsedCounter -= 1000;
+    avgFramerate = frameCount;
+    frameCount = 0;
+  }
 
-  var lastFrame = Date.now();
-  var thisFrame;
-  var elapsed;
-  var delta;
+  if (paused) {
+    renderText('PAUSED', 72, Game.canvasWidth / 2 - 160, 120);
+  } else {
+    requestAnimationFrame(mainLoop, canvasNode);
+  }
+};
 
-  var canvasNode = canvas[0];
+mainLoop();
 
-
-  var mainLoop = function () {
-    context.clearRect(0, 0, Game.canvasWidth, Game.canvasHeight);
-
-    Game.FSM.execute();
-
-    if (KEY_STATUS.g) {
-      context.beginPath();
-      for (var i = 0; i < gridWidth; i++) {
-        context.moveTo(i * GRID_SIZE, 0);
-        context.lineTo(i * GRID_SIZE, Game.canvasHeight);
+window.addEventListener('keydown', function (e) {
+  switch (KEY_CODES[e.code]) {
+    case 'f': // show framerate
+      showFramerate = !showFramerate;
+      break;
+    case 'p': // pause
+      paused = !paused;
+      if (!paused) {
+        // start up again
+        lastFrame = Date.now();
+        mainLoop();
       }
-      for (var j = 0; j < gridHeight; j++) {
-        context.moveTo(0, j * GRID_SIZE);
-        context.lineTo(Game.canvasWidth, j * GRID_SIZE);
-      }
-      context.closePath();
-      context.stroke();
-    }
-
-    thisFrame = Date.now();
-    elapsed = thisFrame - lastFrame;
-    lastFrame = thisFrame;
-    delta = elapsed / 30;
-
-    for (i = 0; i < sprites.length; i++) {
-
-      sprites[i].run(delta);
-
-      if (sprites[i].reap) {
-        sprites[i].reap = false;
-        sprites.splice(i, 1);
-        i--;
-      }
-    }
-
-    // score
-    var score_text = '' + Game.score;
-    renderText(score_text, 20, Game.canvasWidth - 14 * score_text.length, 20);
-
-    // extra dudes
-    for (i = 0; i < Game.lives; i++) {
-      context.save();
-      extraDude.x = Game.canvasWidth - (8 * (i + 1));
-      extraDude.y = 32;
-      extraDude.configureTransform();
-      extraDude.draw();
-      context.restore();
-    }
-
-    if (showFramerate) {
-      renderText('' + avgFramerate, 24, Game.canvasWidth - 38, Game.canvasHeight - 2);
-    }
-
-    frameCount++;
-    elapsedCounter += elapsed;
-    if (elapsedCounter > 1000) {
-      elapsedCounter -= 1000;
-      avgFramerate = frameCount;
-      frameCount = 0;
-    }
-
-    if (paused) {
-      renderText('PAUSED', 72, Game.canvasWidth / 2 - 160, 120);
-    } else {
-      requestAnimationFrame(mainLoop, canvasNode);
-    }
-  };
-
-  mainLoop();
-
-  window.addEventListener('keydown', function (e) {
-    switch (KEY_CODES[e.code]) {
-      case 'f': // show framerate
-        showFramerate = !showFramerate;
-        break;
-      case 'p': // pause
-        paused = !paused;
-        if (!paused) {
-          // start up again
-          lastFrame = Date.now();
-          mainLoop();
-        }
-        break;
-      case 'm': // mute
-        SFX.muted = !SFX.muted;
-        break;
-    }
-  });
+      break;
+    case 'm': // mute
+      SFX.muted = !SFX.muted;
+      break;
+  }
+});
 
 // vim: fdl=0
