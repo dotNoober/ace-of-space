@@ -1,11 +1,10 @@
 class soundEffects {
   constructor() {
     this.sfx = {
-      laser: new Audio('sound/584193__unfa__weapons-plasma-shot-01.flac'),
-      explosion: new Audio('sound/584169__unfa__explosion-01.flac'),
-      engineStart: new Audio('sound/584182__unfa__thrust-start.flac'),
-      engineLoop: new Audio('sound/584181__unfa__thrust-loop.flac'),
-      engineEnd: new Audio('sound/584180__unfa__thrust-end.flac'),
+      bg: new Audio('sound/bg/Contact_With_The_Unknown.mp3'),
+      laser: new Audio('sound/sfx/weapons-plasma-shot.flac'),
+      explosion: new Audio('sound/sfx/explosion.flac'),
+      engine: new Audio('sound/sfx/thrust.flac'),
     };
 
     for (const sfxKey in this.sfx) {
@@ -15,6 +14,11 @@ class soundEffects {
     }
 
     this.muted = false;
+
+  }
+
+  bgMusic() {
+    return this.sfx.bg();
   }
 
   laser() {
@@ -25,21 +29,16 @@ class soundEffects {
     return this.sfx.explosion();
   }
 
-  engineStart() {
-    if (!this.muted) {
-      return this.sfx.engineStart();
-    }
+  engine() {
+    return this.sfx.engine();
   }
 
   initializeAudio(sfxKey) {
     const audio = this.sfx[sfxKey];
-    audio.muted = true;
-    audio.play();
 
     this.sfx[sfxKey] = () => {
       if (!this.muted) {
         audio.muted = false;
-        audio.pause();
         audio.currentTime = 0;
         audio.play();
       }

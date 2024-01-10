@@ -45,7 +45,7 @@ const KEY_STATUS = initializeKeyStatus();
 const leftControls = document.getElementById('left-controls');
 const rightControls = document.getElementById('right-controls');
 
-const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+window.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
 if (isTouchDevice) {
     leftControls.style.display = 'block';

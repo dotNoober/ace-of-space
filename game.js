@@ -389,12 +389,19 @@ class Ship extends Sprite {
       }
 
       if (KEY_STATUS.up) {
-          SFX.engineStart();
+        if(!this.engineSound) {
+          this.engineSound = SFX.engine();
+          this.engineSound.loop = true;
+        }
         var rad = ((this.rot - 90) * Math.PI) / 180;
         this.acc.x = 0.5 * Math.cos(rad);
         this.acc.y = 0.5 * Math.sin(rad);
         this.children.exhaust.visible = Math.random() > 0.1;
       } else {
+        if(this.engineSound) {
+        this.engineSound.pause();
+        this.engineSound = undefined;
+        }
         this.acc.x = 0;
         this.acc.y = 0;
         this.children.exhaust.visible = false;
@@ -834,7 +841,7 @@ const Game = {
       this.state = 'waiting';
     },
     waiting: function () {
-      renderText(window.ipad ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth / 2 - 270, Game.canvasHeight / 2);
+      renderText(window.isTouchDevice  ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth / 2 - 270, Game.canvasHeight / 2);
       if (KEY_STATUS.space || window.gameStart) {
         KEY_STATUS.space = false; // hack so we don't shoot right away
         window.gameStart = false;
@@ -842,6 +849,7 @@ const Game = {
       }
     },
     start: function () {
+      SFX.bgMusic();
       for (var i = 0; i < Game.sprites.length; i++) {
         if (Game.sprites[i].name == 'asteroid') {
           Game.sprites[i].die();
