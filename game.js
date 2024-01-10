@@ -945,7 +945,8 @@ const Game = {
 
 const GRID_SIZE = 60;
 
-document.addEventListener('DOMContentLoaded', () => {
+//main code 
+
   var canvas = document.getElementById("canvas");
   Game.canvasWidth = canvas.width;
   Game.canvasHeight = canvas.height;
@@ -1030,19 +1031,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var canvasNode = canvas[0];
 
-  // shim layer with setTimeout fallback
-  // from here:
-  // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-  window.requestAnimFrame = (function () {
-    return window.requestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      window.oRequestAnimationFrame ||
-      window.msRequestAnimationFrame ||
-      function (/* function */ callback, /* DOMElement */ element) {
-        window.setTimeout(callback, 1000 / 60);
-      };
-  })();
 
   var mainLoop = function () {
     context.clearRect(0, 0, Game.canvasWidth, Game.canvasHeight);
@@ -1108,7 +1096,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (paused) {
       renderText('PAUSED', 72, Game.canvasWidth / 2 - 160, 120);
     } else {
-      requestAnimFrame(mainLoop, canvasNode);
+      requestAnimationFrame(mainLoop, canvasNode);
     }
   };
 
@@ -1132,6 +1120,5 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
     }
   });
-});
 
 // vim: fdl=0
