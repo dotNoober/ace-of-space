@@ -782,6 +782,114 @@ class GridNode {
   }
 }
 
+class StateMachine {
+  constructor() {
+    this.state = 'boot';
+  }
+  boot() {
+    Game.spawnAsteroids(5);
+    this.state = 'waiting';
+  }
+  waiting() {
+    renderText(window.isTouchDevice  ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth / 2 - 270, Game.canvasHeight / 2);
+    if (KEY_STATUS.space || window.gameStart) {
+      KEY_STATUS.space = false; // hack so we don't shoot right away
+      window.gameStart = false;
+      this.state = 'start';
+    }
+  }
+  start() {
+    //SFX.bgMusic();
+    for (var i = 0; i < Game.sprites.length; i++) {
+      if (Game.sprites[i].name == 'asteroid') {
+        Game.sprites[i].die();
+      } else if (Game.sprites[i].name == 'bullet' ||
+        Game.sprites[i].name == 'bigalien') {
+        Game.sprites[i].visible = false;
+      }
+    }
+
+    Game.score = 0;
+    Game.lives = 2;
+    Game.totalAsteroids = 2;
+    Game.spawnAsteroids();
+
+    Game.nextBigAlienTime = Date.now() + 30000 + (30000 * Math.random());
+
+    this.state = 'spawn_ship';
+  }
+  spawn_ship() {
+    Game.ship.x = Game.canvasWidth / 2;
+    Game.ship.y = Game.canvasHeight / 2;
+    if (Game.ship.isClear()) {
+      Game.ship.rot = 0;
+      Game.ship.vel.x = 0;
+      Game.ship.vel.y = 0;
+      Game.ship.visible = true;
+      this.state = 'run';
+    }
+  }
+  run() {
+    for (var i = 0; i < Game.sprites.length; i++) {
+      if (Game.sprites[i].name == 'asteroid') {
+        break;
+      }
+    }
+    if (i == Game.sprites.length) {
+      this.state = 'new_level';
+    }
+    if (!Game.bigAlien.visible &&
+      Date.now() > Game.nextBigAlienTime) {
+      Game.bigAlien.visible = true;
+      Game.nextBigAlienTime = Date.now() + (30000 * Math.random());
+    }
+  }
+  new_level() {
+    if (this.timer == null) {
+      this.timer = Date.now();
+    }
+    // wait a second before spawning more asteroids
+    if (Date.now() - this.timer > 1000) {
+      this.timer = null;
+      Game.totalAsteroids++;
+      if (Game.totalAsteroids > 12) Game.totalAsteroids = 12;
+      Game.spawnAsteroids();
+      this.state = 'run';
+    }
+  }
+  player_died() {
+    if (Game.lives < 0) {
+      this.state = 'end_game';
+    } else {
+      if (this.timer == null) {
+        this.timer = Date.now();
+      }
+      // wait a second before spawning
+      if (Date.now() - this.timer > 1000) {
+        this.timer = null;
+        this.state = 'spawn_ship';
+      }
+    }
+  }
+  end_game() {
+    renderText('GAME OVER', 50, Game.canvasWidth / 2 - 160, Game.canvasHeight / 2 + 10);
+    if (this.timer == null) {
+      this.timer = Date.now();
+    }
+    // wait 5 seconds then go back to waiting state
+    if (Date.now() - this.timer > 5000) {
+      this.timer = null;
+      this.state = 'waiting';
+    }
+
+    window.gameStart = false;
+  }
+
+  execute() {
+    this[this.state]();
+  }
+}
+
 function renderText(text, size, x, y) {
     window.context.save();
 
@@ -835,111 +943,7 @@ const Game = {
     Game.sprites.push(splosion);
   },
 
-  FSM: {
-    boot: function () {
-      Game.spawnAsteroids(5);
-      this.state = 'waiting';
-    },
-    waiting: function () {
-      renderText(window.isTouchDevice  ? 'Touch Screen to Start' : 'Press Space to Start', 36, Game.canvasWidth / 2 - 270, Game.canvasHeight / 2);
-      if (KEY_STATUS.space || window.gameStart) {
-        KEY_STATUS.space = false; // hack so we don't shoot right away
-        window.gameStart = false;
-        this.state = 'start';
-      }
-    },
-    start: function () {
-      SFX.bgMusic();
-      for (var i = 0; i < Game.sprites.length; i++) {
-        if (Game.sprites[i].name == 'asteroid') {
-          Game.sprites[i].die();
-        } else if (Game.sprites[i].name == 'bullet' ||
-          Game.sprites[i].name == 'bigalien') {
-          Game.sprites[i].visible = false;
-        }
-      }
-
-      Game.score = 0;
-      Game.lives = 2;
-      Game.totalAsteroids = 2;
-      Game.spawnAsteroids();
-
-      Game.nextBigAlienTime = Date.now() + 30000 + (30000 * Math.random());
-
-      this.state = 'spawn_ship';
-    },
-    spawn_ship: function () {
-      Game.ship.x = Game.canvasWidth / 2;
-      Game.ship.y = Game.canvasHeight / 2;
-      if (Game.ship.isClear()) {
-        Game.ship.rot = 0;
-        Game.ship.vel.x = 0;
-        Game.ship.vel.y = 0;
-        Game.ship.visible = true;
-        this.state = 'run';
-      }
-    },
-    run: function () {
-      for (var i = 0; i < Game.sprites.length; i++) {
-        if (Game.sprites[i].name == 'asteroid') {
-          break;
-        }
-      }
-      if (i == Game.sprites.length) {
-        this.state = 'new_level';
-      }
-      if (!Game.bigAlien.visible &&
-        Date.now() > Game.nextBigAlienTime) {
-        Game.bigAlien.visible = true;
-        Game.nextBigAlienTime = Date.now() + (30000 * Math.random());
-      }
-    },
-    new_level: function () {
-      if (this.timer == null) {
-        this.timer = Date.now();
-      }
-      // wait a second before spawning more asteroids
-      if (Date.now() - this.timer > 1000) {
-        this.timer = null;
-        Game.totalAsteroids++;
-        if (Game.totalAsteroids > 12) Game.totalAsteroids = 12;
-        Game.spawnAsteroids();
-        this.state = 'run';
-      }
-    },
-    player_died: function () {
-      if (Game.lives < 0) {
-        this.state = 'end_game';
-      } else {
-        if (this.timer == null) {
-          this.timer = Date.now();
-        }
-        // wait a second before spawning
-        if (Date.now() - this.timer > 1000) {
-          this.timer = null;
-          this.state = 'spawn_ship';
-        }
-      }
-    },
-    end_game: function () {
-      renderText('GAME OVER', 50, Game.canvasWidth / 2 - 160, Game.canvasHeight / 2 + 10);
-      if (this.timer == null) {
-        this.timer = Date.now();
-      }
-      // wait 5 seconds then go back to waiting state
-      if (Date.now() - this.timer > 5000) {
-        this.timer = null;
-        this.state = 'waiting';
-      }
-
-      window.gameStart = false;
-    },
-
-    execute: function () {
-      this[this.state]();
-    },
-    state: 'boot'
-  }
+  FSM: new StateMachine()
 
 };
 
