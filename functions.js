@@ -1,3 +1,4 @@
+import { GridNode } from "./classes.js";
 
 export function saveHighScore(score) {
   // Get current date/time
@@ -54,3 +55,39 @@ export function renderText(text, size, x, y) {
 
   window.context.restore();
 }
+
+export function createGrid(gridWidth, gridHeight, gameWidth, gameHeight) {
+  const grid = new Array(gridWidth);
+
+  for (let i = 0; i < gridWidth; i++) {
+    grid[i] = new Array(gridHeight);
+    for (let j = 0; j < gridHeight; j++) {
+      grid[i][j] = new GridNode();
+    }
+  }
+
+  // set up the positional references
+  for (let i = 0; i < gridWidth; i++) {
+    for (let j = 0; j < gridHeight; j++) {
+      const node = grid[i][j];
+      node.north = grid[i][(j === 0) ? gridHeight - 1 : j - 1];
+      node.south = grid[i][(j === gridHeight - 1) ? 0 : j + 1];
+      node.west = grid[(i === 0) ? gridWidth - 1 : i - 1][j];
+      node.east = grid[(i === gridWidth - 1) ? 0 : i + 1][j];
+    }
+  }
+
+  // set up borders
+  for (let i = 0; i < gridWidth; i++) {
+    grid[i][0].dupe.vertical = gameHeight;
+    grid[i][gridHeight - 1].dupe.vertical = -gameHeight;
+  }
+
+  for (let j = 0; j < gridHeight; j++) {
+    grid[0][j].dupe.horizontal = gameWidth;
+    grid[gridWidth - 1][j].dupe.horizontal = -gameWidth;
+  }
+
+  return grid;
+}
+

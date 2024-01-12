@@ -913,6 +913,17 @@ export class Game {
     this.nextBigAlienTime = null;
 
     this.FSM = new StateMachine();
+
+    this.paused = false;
+    this.showFramerate = false;
+    this.avgFramerate = 0;
+    this.frameCount = 0;
+    this.elapsedCounter = 0;
+
+    this.lastFrame = Date.now();
+    this.thisFrame = null;
+    this.elapsed = null;
+    this.delta = null;
   }
 
   spawnAsteroids(count) {

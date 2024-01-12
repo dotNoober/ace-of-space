@@ -1,71 +1,10 @@
-// Canvas Asteroids
-//
-// Copyright (c) 2010 Doug McInnes
-//
-
-import { Game, GridNode, Ship } from "./classes.js";
-import { renderText } from "./functions.js";
+import { Game } from "./classes.js";
+import { renderText, createGrid } from "./functions.js";
 import { SFX } from "./sounds-effects.js";
 import { KEY_STATUS, KEY_CODES } from "./user-input.js";
 
-export const GRID_SIZE = 60;
 
-const canvas = document.getElementById("canvas");
-window.gameWidth = canvas.width;
-window.gameHeight = canvas.height;
-window.context = canvas.getContext("2d");
-window.context.strokeStyle = "white";
-window.context.fillStyle = "white"
-
-const gridWidth = Math.round(window.gameWidth / GRID_SIZE);
-const gridHeight = Math.round(window.gameHeight / GRID_SIZE);
-window.grid = new Array(gridWidth);
-for (let i = 0; i < gridWidth; i++) {
-  grid[i] = new Array(gridHeight);
-  for (let j = 0; j < gridHeight; j++) {
-    grid[i][j] = new GridNode();
-  }
-}
-
-// set up the positional references
-for (let i = 0; i < gridWidth; i++) {
-  for (let j = 0; j < gridHeight; j++) {
-    var node = grid[i][j];
-    node.north = grid[i][(j == 0) ? gridHeight - 1 : j - 1];
-    node.south = grid[i][(j == gridHeight - 1) ? 0 : j + 1];
-    node.west = grid[(i == 0) ? gridWidth - 1 : i - 1][j];
-    node.east = grid[(i == gridWidth - 1) ? 0 : i + 1][j];
-  }
-}
-
-// set up borders
-for (let i = 0; i < gridWidth; i++) {
-  grid[i][0].dupe.vertical = window.gameHeight;
-  grid[i][gridHeight - 1].dupe.vertical = -window.gameHeight;
-}
-
-for (let j = 0; j < gridHeight; j++) {
-  grid[0][j].dupe.horizontal = window.gameWidth;
-  grid[gridWidth - 1][j].dupe.horizontal = -window.gameWidth
-}
-
-export const game = new Game();
-
-var paused = false;
-var showFramerate = false;
-var avgFramerate = 0;
-var frameCount = 0;
-var elapsedCounter = 0;
-
-var lastFrame = Date.now();
-var thisFrame;
-var elapsed;
-var delta;
-
-var canvasNode = canvas[0];
-
-
-var mainLoop = function () {
+function mainLoop() {
   context.clearRect(0, 0, game.canvasWidth, window.gameHeight);
 
   game.FSM.execute();
@@ -84,14 +23,14 @@ var mainLoop = function () {
     context.stroke();
   }
 
-  thisFrame = Date.now();
-  elapsed = thisFrame - lastFrame;
-  lastFrame = thisFrame;
-  delta = elapsed / 30;
+  game.thisFrame = Date.now();
+  game.elapsed = game.thisFrame - game.lastFrame;
+  game.lastFrame = game.thisFrame;
+  game.delta = game.elapsed / 30;
 
   for (i = 0; i < game.sprites.length; i++) {
 
-    game.sprites[i].run(delta);
+    game.sprites[i].run(game.delta);
 
     if (game.sprites[i].reap) {
       game.sprites[i].reap = false;
@@ -114,37 +53,53 @@ var mainLoop = function () {
     window.context.restore();
   }
 
-  if (showFramerate) {
-    renderText('' + avgFramerate, 24, window.gameWidth - 38, window.gameHeight - 2);
+  if (game.showFramerate) {
+    renderText('' + game.avgFramerate, 24, window.gameWidth - 38, window.gameHeight - 2);
   }
 
-  frameCount++;
-  elapsedCounter += elapsed;
-  if (elapsedCounter > 1000) {
-    elapsedCounter -= 1000;
-    avgFramerate = frameCount;
-    frameCount = 0;
+  game.frameCount++;
+  game.elapsedCounter += game.elapsed;
+  if (game.elapsedCounter > 1000) {
+    game.elapsedCounter -= 1000;
+    game.avgFramerate = game.frameCount;
+    game.frameCount = 0;
   }
 
-  if (paused) {
+  if (game.paused) {
     renderText('PAUSED', 72, window.gameWidth / 2 - 160, 120);
   } else {
-    requestAnimationFrame(mainLoop, canvasNode);
+    requestAnimationFrame(mainLoop);
   }
-};
+}
+
+export const GRID_SIZE = 60;
+
+const canvas = document.getElementById("canvas");
+window.gameWidth = canvas.width;
+window.gameHeight = canvas.height;
+window.context = canvas.getContext("2d");
+window.context.strokeStyle = "white";
+window.context.fillStyle = "white"
+
+const gridWidth = Math.round(window.gameWidth / GRID_SIZE);
+const gridHeight = Math.round(window.gameHeight / GRID_SIZE);
+window.grid = createGrid(gridWidth, gridHeight, window.gameWidth, window.gameHeight);
+
+
+export const game = new Game();
 
 mainLoop();
 
 window.addEventListener('keydown', function (e) {
   switch (KEY_CODES[e.code]) {
     case 'f': // show framerate
-      showFramerate = !showFramerate;
+      game.showFramerate = !game.showFramerate;
       break;
     case 'p': // pause
-      paused = !paused;
-      if (!paused) {
+      game.paused = !game.paused;
+      if (!game.paused) {
         // start up again
-        lastFrame = Date.now();
+        game.lastFrame = Date.now();
         mainLoop();
       }
       break;
