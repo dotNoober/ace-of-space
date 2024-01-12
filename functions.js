@@ -18,16 +18,20 @@ export function saveHighScore(score) {
   // Sort high scores in descending order based on the score
   highScores.sort((a, b) => b.score - a.score);
 
+  // Only keep the top 10 high scores
+  highScores = highScores.slice(0, 10);
+
   // Save the updated high scores array back to localStorage
   localStorage.setItem('highScores', JSON.stringify(highScores));
 }
+
 function getHighScores() {
   // Get high scores from localStorage or return an empty array if not present
   return JSON.parse(localStorage.getItem('highScores')) || [];
 }
 
 export function renderHighScores() {
-  let row = 66;
+  let row = 80;
   window.context.save();
   window.context.globalAlpha = 0.1;
   window.context.fillRect(window.gameWidth - 380, 40, 340, window.gameHeight - 80);
