@@ -1,3 +1,7 @@
+import { game } from "./game.js";
+import { mainLoop } from "./functions.js";
+import { SFX } from "./sounds-effects.js";
+
 function initializeKeyStatus() {
   // Initialize key status object with a default keyDown value
   const keyStatus = { keyDown: false };
@@ -66,7 +70,26 @@ document.addEventListener('touchstart', function () {
   window.gameStart = true;
 }, { passive: false });
 
-window.addEventListener('keydown', (e) => {
+addEventListener('keydown', function (e) {
+  switch (KEY_CODES[e.code]) {
+    case 'f': // show framerate
+      game.showFramerate = !game.showFramerate;
+      break;
+    case 'p': // pause
+      game.paused = !game.paused;
+      if (!game.paused) {
+        // start up again
+        game.lastFrame = Date.now();
+        mainLoop();
+      }
+      break;
+    case 'm': // mute
+      SFX.muted = !SFX.muted;
+      break;
+  }
+});
+
+addEventListener('keydown', (e) => {
   KEY_STATUS.keyDown = true;
   const keyName = KEY_CODES[e.code];
   if (keyName) {
@@ -75,7 +98,7 @@ window.addEventListener('keydown', (e) => {
   }
 })
 
-window.addEventListener('keyup', (e) => {
+addEventListener('keyup', (e) => {
   KEY_STATUS.keyDown = false;
   const keyName = KEY_CODES[e.code];
   if (keyName) {

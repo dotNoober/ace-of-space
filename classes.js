@@ -653,7 +653,7 @@ class Asteroid extends Sprite {
     this.scale = 6;
     this.postMove = this.wrapPostMove;
 
-    this.collidesWith = ["ship", "bullet", "bigalien", "alienbullet"];
+    this.collidesWith = ["ship", "bullet", "bigalien", "alienbullet", "asteroid"];
 
     this.collision = function (other) {
       SFX.explosion();
