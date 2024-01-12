@@ -3,23 +3,19 @@
 // Copyright (c) 2010 Doug McInnes
 //
 
-import { Game, GridNode, Ship, Bullet, BigAlien } from "./classes.js";
+import { Game, GridNode, Ship } from "./classes.js";
 import { renderText } from "./functions.js";
 import { SFX } from "./sounds-effects.js";
 import { KEY_STATUS, KEY_CODES } from "./user-input.js";
 
 export const GRID_SIZE = 60;
 
-export const game = new Game();
-
-//main code 
-
 const canvas = document.getElementById("canvas");
 window.gameWidth = canvas.width;
 window.gameHeight = canvas.height;
 window.context = canvas.getContext("2d");
 window.context.strokeStyle = "white";
-window.context.fillStyle = "white";
+window.context.fillStyle = "white"
 
 const gridWidth = Math.round(window.gameWidth / GRID_SIZE);
 const gridHeight = Math.round(window.gameHeight / GRID_SIZE);
@@ -49,38 +45,11 @@ for (let i = 0; i < gridWidth; i++) {
 }
 
 for (let j = 0; j < gridHeight; j++) {
-  grid[0][j].dupe.horizontal = game.canvasWidth;
-  grid[gridWidth - 1][j].dupe.horizontal = -game.canvasWidth;
+  grid[0][j].dupe.horizontal = window.gameWidth;
+  grid[gridWidth - 1][j].dupe.horizontal = -window.gameWidth
 }
 
-
-var ship = new Ship();
-
-ship.x = window.gameWidth / 2;
-ship.y = window.gameHeight / 2;
-
-game.sprites.push(ship);
-
-ship.bullets = [];
-for (var i = 0; i < 10; i++) {
-  var bull = new Bullet();
-  ship.bullets.push(bull);
-  game.sprites.push(bull);
-}
-game.ship = ship;
-
-var bigAlien = new BigAlien();
-bigAlien.setup();
-game.sprites.push(bigAlien);
-game.bigAlien = bigAlien;
-
-var extraDude = new Ship();
-extraDude.scale = 0.6;
-extraDude.visible = true;
-extraDude.preMove = null;
-extraDude.children = [];
-
-var i, j = 0;
+export const game = new Game();
 
 var paused = false;
 var showFramerate = false;
@@ -137,12 +106,12 @@ var mainLoop = function () {
 
   // extra dudes
   for (i = 0; i < game.lives; i++) {
-    context.save();
-    extraDude.x = window.gameWidth - (8 * (i + 1));
-    extraDude.y = 32;
-    extraDude.configureTransform();
-    extraDude.draw();
-    context.restore();
+    window.context.save();
+    game.extraDude.x = window.gameWidth - (8 * (i + 1));
+    game.extraDude.y = 32;
+    game.extraDude.configureTransform();
+    game.extraDude.draw();
+    window.context.restore();
   }
 
   if (showFramerate) {

@@ -368,6 +368,11 @@ export class Ship extends Sprite {
         0, 11,
         3, 6]);
 
+
+    
+    this.x = window.gameWidth / 2;
+    this.y = window.gameHeight / 2;
+    this.bullets = [];
     this.bulletCounter = 0;
 
     this.postMove = this.wrapPostMove;
@@ -495,12 +500,6 @@ export class BigAlien extends Sprite {
 
     this.setup = function () {
       this.newPosition();
-
-      for (var i = 0; i < 3; i++) {
-        var bull = new AlienBullet();
-        this.bullets.push(bull);
-        game.sprites.push(bull);
-      }
     };
 
     this.preMove = function (delta) {
@@ -886,10 +885,33 @@ export class Game {
     this.lives = 0;
     this.canvasWidth = 800;
     this.canvasHeight = 600;
+
     this.sprites = [];
-    this.ship = null;
-    this.bigAlien = null;
+
+    this.ship = new Ship();
+    for (let i = 0; i < 10; i++) {
+      const bullet = new Bullet();
+      this.ship.bullets.push(bullet);
+      this.sprites.push(bullet);
+    }
+    this.sprites.push(this.ship);
+
+    this.extraDude = new Ship();
+    this.extraDude.scale = 0.6;
+    this.extraDude.visible = true;
+    this.extraDude.preMove = null;
+    this.extraDude.children = [];
+
+    this.bigAlien = new BigAlien();
+    this.bigAlien.setup();
+    for (let i = 0; i < 3; i++) {
+      const bullet = new AlienBullet();
+      this.bigAlien.bullets.push(bullet);
+      this.sprites.push(bullet);
+    }
+    this.sprites.push(this.bigAlien);
     this.nextBigAlienTime = null;
+
     this.FSM = new StateMachine();
   }
 
